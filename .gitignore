@@ -1,0 +1,9 @@
+# Ignore local Kaggle downloads and caches
+.kaggle/
+~/.kaggle/
+__pycache__/
+*.pyc
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
