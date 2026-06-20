@@ -2,13 +2,19 @@ import os
 import glob
 import pandas as pd
 import kagglehub
+import streamlit as st
 
 def load_university_data():
     """
-    Automatically downloads the latest version of the Wikipedia 
-    University dataset using kagglehub and loads it into a Pandas DataFrame.
+    Automatically sets up Kaggle credentials and downloads the latest 
+    version of the Wikipedia University dataset.
     """
     try:
+        # Check if Kaggle credentials exist in Streamlit Secrets (for Cloud Deployment)
+        if "KAGGLE_USERNAME" in st.secrets and "KAGGLE_KEY" in st.secrets:
+            os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
+            os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
+        
         # Download latest version of the dataset
         path = kagglehub.dataset_download("muhamamdnaveed/wikipedia-datasets-of-universities")
         
@@ -22,19 +28,17 @@ def load_university_data():
         df = pd.read_csv(csv_files[0])
         
         # Basic Data Cleaning & Feature Extraction
-        # Parse coordinates 'Point(lon lat)' if present
         if 'coord' in df.columns:
             df['coord'] = df['coord'].astype(str)
-            # Extract longitude and latitude safely
             df['lon'] = df['coord'].apply(lambda x: float(x.split('(')[-1].split(')')[0].split()[0]) if 'Point' in x else None)
             df['lat'] = df['coord'].apply(lambda x: float(x.split('(')[-1].split(')')[0].split()[1]) if 'Point' in x else None)
         
-        # Fill missing values for cleaner rendering
         df['universityLabel'] = df['universityLabel'].fillna("Unknown University")
         df['countryLabel'] = df['countryLabel'].fillna("Unknown Country")
         
         return df
 
     except Exception as e:
-        print(f"Error loading data: {e}")
-        return pd.DataFrame() # Return empty DataFrame on failure
+        # Print the exact error log to the Streamlit console for easier debugging
+        st.sidebar.error(f"KaggleHub Error Log: {e}")
+        return pd.DataFrame()
