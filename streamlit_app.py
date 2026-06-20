@@ -49,7 +49,7 @@ else:
                     with col1:
                         fancy_ui.markdown(f"### 🏛️ {row['universityLabel']}")
                         fancy_ui.markdown(f"**📍 Location:** {row['countryLabel']} | **📅 Founded/Inception:** {row['inception']}")
-                    with col2:
+                    
                         
                     
                     fancy_ui.markdown("---")
